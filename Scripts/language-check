@@ -1,0 +1,6 @@
+#!c:\users\ajay\desktop\learning\python\webscraping\webscrap_lnmtl\scripts\python.exe
+
+import sys
+
+from language_check import main
+sys.exit(main.main())
