@@ -1,4 +1,4 @@
-from multiprocessing import Process
+import os
 import requests
 from bs4 import BeautifulSoup as soup
 import language_check
@@ -8,12 +8,15 @@ import random
 tool = language_check.LanguageTool('en-US')
 #Declare the file we want to store to
 
-def WebScrape(startPage, endPage):
-    # fileName = 'super_magic_god_of_harry_potter_langCheck'+ str(startPage) + '_' + str(endPage) +'.txt'
-    f= open("super_magic_god_of_harry_potter_langCheck751_796.txt","a+",encoding="utf-8")
+def WebScrape( myUrl, fileName, startPage, endPage):
 
-    myUrl = 'http://lnmtl.com/chapter/super-magic-god-of-harry-potter-chapter-'
-
+    if os.path.exists(fileName):
+        print("Append TO existing file")
+        f= open(fileName,"a+",encoding="utf-8")
+    else:
+        print("Create new file")
+        f= open(fileName,"w+",encoding="utf-8")
+    #myUrl = 'https://comrademao.com/mtl/all-attributes-martial-path/all-attributes-martial-path-chapter-'
 
     for page in range(startPage, endPage):
         #traverse the Site
@@ -24,14 +27,15 @@ def WebScrape(startPage, endPage):
             uClient.encoding = "utf-8"
             html_content = soup(uClient.content, 'html.parser')
 
-            Body = html_content.findAll("div",{"class":'chapter-body'})
+            Body = html_content.findAll("article",{"class":'status-publish'})
 
-            translatedBody = Body[0].findAll("sentence",{"class":'translated'})
+            translatedBody = Body[0].findAll("p")
+            transaltedText = translatedBody[0].find_all("p",class_=False)
             count = 0
-            for transdiv in translatedBody:
+            for transdiv in transaltedText:
                 temp  = transdiv.text
                 temp = temp.replace("\t", "").replace("\r", "").replace("\n", "")
-                temp = temp.replace("„","\"").replace("”","\"")
+                temp = temp.replace("„","\"").replace("”","\"").replace("“","\"").replace("”","\"")
                 matches = tool.check(temp)
                 #print(len(matches))
                 if(len(matches) > 0):
@@ -46,7 +50,6 @@ def WebScrape(startPage, endPage):
                 f.write("\n")
 
             f.write("\n\n")
-            # f1.write("\n\n")
             print("Completed page")
         except:
             continue
@@ -58,7 +61,9 @@ def WebScrape(startPage, endPage):
 
 
 if __name__ == '__main__':
-        srtPage = 772
-        endPage = 796
-        WebScrape(srtPage,endPage)
+        srtPage = 201
+        endPage = 593
+        fileName = "all_attributes_martial_path.txt"
+        myUrl = 'https://comrademao.com/mtl/all-attributes-martial-path/all-attributes-martial-path-chapter-'
+        WebScrape(myUrl, fileName, srtPage, endPage)
         
